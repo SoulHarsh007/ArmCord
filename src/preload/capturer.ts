@@ -1,10 +1,10 @@
 //Fixed context isolation version https://github.com/getferdi/ferdi/blob/develop/src/webview/screenshare.ts
 //original https://github.com/electron/electron/issues/16513#issuecomment-602070250
-import {addScript, addStyle} from "../utils";
-import fs from "fs";
-import path from "path";
+import { addScript, addStyle } from '../utils';
+import fs from 'fs';
+import path from 'path';
 
-const CANCEL_ID = "desktop-capturer-selection__cancel";
+const CANCEL_ID = 'desktop-capturer-selection__cancel';
 
 const screenShareJS = `
 window.navigator.mediaDevices.getDisplayMedia = () => new Promise(async (resolve, reject) => {
@@ -46,9 +46,13 @@ window.navigator.mediaDevices.getDisplayMedia = () => new Promise(async (resolve
 });
 `;
 
-document.addEventListener("DOMContentLoaded", function () {
-    addScript(screenShareJS);
-    const screenshareCss = path.join(__dirname, "../", "/content/css/screenshare.css");
-    addStyle(fs.readFileSync(screenshareCss, "utf8"));
-    console.log("Capturer injected.");
+document.addEventListener('DOMContentLoaded', function () {
+  addScript(screenShareJS);
+  const screenshareCss = path.join(
+    __dirname,
+    '../',
+    '/content/css/screenshare.css'
+  );
+  addStyle(fs.readFileSync(screenshareCss, 'utf8'));
+  console.log('Capturer injected.');
 });

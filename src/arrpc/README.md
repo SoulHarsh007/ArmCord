@@ -17,9 +17,9 @@ arRPC is an open source implementation of Discord's half-documented local RPC se
 
 Rich Presence (RPC) is the name for how some apps can talk to Discord desktop on your PC via localhost servers to display detailed info about the app's state. This usually works via parts of Discord desktop natively doing things + parts of Discord web interpreting that and setting it as your status. arRPC is an open source implementation of the local RPC servers on your PC, allowing apps to talk to it thinking it was just normal Discord. It can then send that info to apps which usually don't get RPC, like Discord Web, ArmCord, etc. which can then set that as your status. This would otherwise not be possible, as web apps/browsers/etc can't just use Discord's already existing code and version.
 
--   App with Discord RPC
--   ~~Discord Desktop's native server~~ arRPC
--   ~~Discord Web's setting~~ mod/plugin
+- App with Discord RPC
+- ~~Discord Desktop's native server~~ arRPC
+- ~~Discord Web's setting~~ mod/plugin
 
 <br>
 
@@ -66,17 +66,17 @@ Then just use apps with Discord RPC like normal and they _should_ work!
 
 ### Transports
 
--   [x] WebSocket Server
-    -   [x] JSON
-    -   [ ] Erlpack
--   [ ] HTTP Server
--   [x] IPC
--   [x] Process Scanning
+- [x] WebSocket Server
+  - [x] JSON
+  - [ ] Erlpack
+- [ ] HTTP Server
+- [x] IPC
+- [x] Process Scanning
 
 ### Commands
 
--   [x] DISPATCH
--   [x] SET_ACTIVITY
--   [x] INVITE_BROWSER
--   [x] GUILD_TEMPLATE_BROWSER
--   [x] DEEP_LINK
+- [x] DISPATCH
+- [x] SET_ACTIVITY
+- [x] INVITE_BROWSER
+- [x] GUILD_TEMPLATE_BROWSER
+- [x] DEEP_LINK

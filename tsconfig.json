@@ -1,16 +1,16 @@
 {
-    "include": ["src/**/*"],
-    "compilerOptions": {
-        "outDir": "ts-out",
-        "module": "CommonJS",
-        "strict": true,
-        "esModuleInterop": true,
-        "lib": ["ES2020", "DOM"],
-        "resolveJsonModule": true,
-        "declaration": true,
-        "declarationMap": true,
-        "declarationDir": "typings",
-        "target": "esnext",
-        "importHelpers": false
-    }
+  "include": ["src/**/*"],
+  "compilerOptions": {
+    "outDir": "ts-out",
+    "module": "CommonJS",
+    "strict": true,
+    "esModuleInterop": true,
+    "lib": ["ES2020", "DOM"],
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "declarationDir": "typings",
+    "target": "esnext",
+    "importHelpers": false
+  }
 }
