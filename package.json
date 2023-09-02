@@ -32,7 +32,6 @@
     "homepage": "https://github.com/armcord/armcord#readme",
     "devDependencies": {
         "@types/node": "^20.5.8",
-        "@types/ws": "^8.5.5",
         "@typescript-eslint/eslint-plugin": "^6.5.0",
         "@typescript-eslint/parser": "^6.5.0",
         "copyfiles": "^2.4.1",
@@ -40,7 +39,6 @@
         "electron-builder": "^24.6.4",
         "eslint": "^8.48.0",
         "eslint-config-dmitmel": "github:dmitmel/eslint-config-dmitmel",
-        "eslint-plugin-node": "^11.1.0",
         "eslint-plugin-prettier": "^5.0.0",
         "prettier": "^3.0.3",
         "typescript": "^5.2.2"
@@ -50,8 +48,7 @@
         "cross-fetch": "^4.0.0",
         "electron-context-menu": "github:ArmCord/electron-context-menu",
         "extract-zip": "^2.0.1",
-        "v8-compile-cache": "^2.4.0",
-        "ws": "^8.13.0"
+        "v8-compile-cache": "^2.4.0"
     },
     "build": {
         "nsis": {
