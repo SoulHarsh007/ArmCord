@@ -7,8 +7,13 @@
     "node": ">=20.5.1"
   },
   "scripts": {
-    "build": "tsc && copyfiles -u 1 src/**/*.html src/**/**/*.css src/**/**/*.js ts-out/ && copyfiles package.json ts-out/ && copyfiles assets/**/** ts-out/",
+    "build": "tsc && copyfiles -u 1 src/**/*.html src/**/**/*.css src/**/**/*.js ts-out/ && copyfiles package.json ts-out/ && copyfiles assets/**/** ts-out/ && npm run compress",
     "watch": "tsc -w",
+    "compress": "echo 'Compressing files. This may take some time...' && npm run compresscss && npm run compressjs && npm run compresshtml && npm run compressjson",
+    "compresscss": "find ts-out -name '*.css' ! -name 'css_' -print0 | xargs -0 -I {} node-minify -c clean-css -O2 -i {} -o {}",
+    "compressjs": "find ts-out -name '*.js' ! -name 'js_' -print0 | xargs -0 -I {} node-minify -c terser -i {} -o {}",
+    "compresshtml": "find ts-out -name '*.html' ! -name 'html_' -print0 | xargs -0 -I {} node-minify -c html-minifier -i {} -o {}",
+    "compressjson": "find ts-out -name '*.json' ! -name 'json_' -print0 | xargs -0 -I {} node-minify -c jsonminify -i {} -o {}",
     "start": "npm run build && electron ./ts-out/main.js",
     "startThemeManager": "npm run build && electron ./ts-out/main.js themes",
     "startKeybindManager": "npm run build && electron ./ts-out/main.js keybinds",
@@ -41,7 +46,12 @@
     "eslint-config-dmitmel": "github:dmitmel/eslint-config-dmitmel",
     "eslint-plugin-prettier": "^5.0.0",
     "prettier": "^3.0.3",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "@node-minify/clean-css": "^8.0.6",
+    "@node-minify/jsonminify": "^8.0.6",
+    "@node-minify/html-minifier": "^8.0.6",
+    "@node-minify/terser": "^8.0.6",
+    "@node-minify/cli": "^8.0.6"
   },
   "dependencies": {
     "arrpc": "file:src/arrpc",
