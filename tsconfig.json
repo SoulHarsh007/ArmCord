@@ -11,6 +11,7 @@
     "declarationMap": true,
     "declarationDir": "typings",
     "target": "esnext",
-    "importHelpers": false
+    "importHelpers": false,
+    "skipLibCheck": true
   }
 }
