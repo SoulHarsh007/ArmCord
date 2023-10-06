@@ -28,7 +28,6 @@ import {
 import { createTManagerWindow } from './themeManager/main';
 import { createSplashWindow } from './splash/main';
 import { createSetupWindow } from './setup/main';
-import { createKeybindWindow } from './keybindMaker/main';
 
 export let iconPath: string;
 export let settings: any;

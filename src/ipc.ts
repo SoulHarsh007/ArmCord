@@ -30,7 +30,6 @@ import fs from 'fs';
 import path from 'path';
 import { createTManagerWindow } from './themeManager/main';
 import { splashWindow } from './splash/main';
-import { createKeybindWindow } from './keybindMaker/main';
 const userDataPath = app.getPath('userData');
 const storagePath = path.join(userDataPath, '/storage/');
 const themesPath = path.join(userDataPath, '/themes/');
