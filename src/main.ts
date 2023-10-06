@@ -124,9 +124,6 @@ if (
         case 'themes':
           createTManagerWindow();
           break;
-        case 'keybinds':
-          createKeybindWindow();
-          break;
         default:
           if (args.includes('=')) {
             const [key, value] = args.split('=');

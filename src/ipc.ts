@@ -148,9 +148,6 @@ export function registerIpc(): void {
   ipcMain.on('openManagerWindow', () => {
     createTManagerWindow();
   });
-  ipcMain.on('openKeybindWindow', () => {
-    createKeybindWindow();
-  });
   ipcMain.on('setting-armcordCSP', async (event) => {
     if (await getConfig('armcordCSP')) {
       event.returnValue = true;
