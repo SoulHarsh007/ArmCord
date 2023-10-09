@@ -175,9 +175,15 @@ async function doAfterDefiningTheWindow(): Promise<void> {
   mainWindow.webContents.session.webRequest.onBeforeRequest(
     {
       urls: [
-        'https://*/api/v*/science',
-        'https://sentry.io/*',
+        // Discord. Blocking tracking and some URLs that just eat bandwidth.
+        'https://*/api/v*/science', // General telemetry
         'https://*.nel.cloudflare.com/*',
+        'https://*/api/v*/applications/detectable',
+        'https://*/api/v*/auth/location-metadata',
+        'https://cdn.discordapp.com/bad-domains/*',
+        // Youtube. Blocking everything that is not needed for playback.
+        'https://www.youtube.com/youtubei/v*/next?*',
+        'https://www.youtube.com/s/desktop/*',
       ],
     },
     (_, callback) => callback({ cancel: true })
