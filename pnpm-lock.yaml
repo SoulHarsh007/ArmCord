@@ -17,6 +17,9 @@ dependencies:
   extract-zip:
     specifier: ^2.0.1
     version: 2.0.1
+  pnpm:
+    specifier: ^8.9.0
+    version: 8.9.0
   v8-compile-cache:
     specifier: ^2.4.0
     version: 2.4.0
@@ -50,8 +53,8 @@ devDependencies:
     specifier: ^2.4.1
     version: 2.4.1
   electron:
-    specifier: 26.3.0
-    version: 26.3.0
+    specifier: 27.0.0-beta.9
+    version: 27.0.0-beta.9
   electron-builder:
     specifier: ^24.6.4
     version: 24.6.4
@@ -60,7 +63,7 @@ devDependencies:
     version: 8.51.0
   eslint-config-dmitmel:
     specifier: github:dmitmel/eslint-config-dmitmel
-    version: github.com/dmitmel/eslint-config-dmitmel/690f1b1121d342fcc8ee511ca9f2af7502f53db6(eslint@8.51.0)
+    version: github.com/dmitmel/eslint-config-dmitmel/d97129ec35235415c6ae6a42299f55cdbb5d75fd(eslint@8.51.0)
   eslint-plugin-prettier:
     specifier: ^5.0.0
     version: 5.0.0(eslint@8.51.0)(prettier@3.0.3)
@@ -1386,8 +1389,9 @@ packages:
       - supports-color
     dev: true
 
-  /electron-dl@3.5.0:
-    resolution: {integrity: sha512-Oj+VSuScVx8hEKM2HEvTQswTX6G3MLh7UoAz/oZuvKyNDfudNi1zY6PK/UnFoK1nCl9DF6k+3PFwElKbtZlDig==}
+  /electron-dl@3.5.1:
+    resolution: {integrity: sha512-5Yb9s/iPVJ5mW5x3j6XkKxt7WEqREr/AhYxZmtEfW1ffQHs1+aGoiQ2fXCAU6UIXMnWog2MXK82vrxJsjA3nbQ==}
+    engines: {node: '>=12'}
     dependencies:
       ext-name: 5.0.0
       pupa: 2.1.1
@@ -1412,8 +1416,8 @@ packages:
       - supports-color
     dev: true
 
-  /electron@26.3.0:
-    resolution: {integrity: sha512-7ZpvSHu+jmqialSvywTZnOQZZGLqlyj+yV5HGDrEzFnMiFaXBRpbByHgoUhaExJ/8t/0xKQjKlMRAY65w+zNZQ==}
+  /electron@27.0.0-beta.9:
+    resolution: {integrity: sha512-4h78B843eYU2oh2yMjrwYtl5aVMiFdpurIwtoZvXpfTwyuKiEOQaylmLbi4+sPg1rCmqW/VLv9hfVlOqHDNj/Q==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
     requiresBuild: true
@@ -2771,6 +2775,12 @@ packages:
       xmlbuilder: 15.1.1
     dev: true
 
+  /pnpm@8.9.0:
+    resolution: {integrity: sha512-74hZk44fBTe5/PAwkEQxE5Lzs4s0QXbmzU/e4hsiVSSwrCobCK4q4t3Vs/9LjKSW1neOlQ8+fJ9VW4EyWYJEHA==}
+    engines: {node: '>=16.14'}
+    hasBin: true
+    dev: false
+
   /prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
@@ -3516,8 +3526,8 @@ packages:
       typedarray-to-buffer: 3.1.5
     dev: true
 
-  /ws@8.13.0:
-    resolution: {integrity: sha512-x9vcZYTrFPC7aSIbj7sRCYo7L/Xb8Iy+pW0ng0wt2vCJv7M9HOMy0UoN3rr+IFC7hb7vXoqS+P9ktyLLLhO+LA==}
+  /ws@8.14.2:
+    resolution: {integrity: sha512-wEBG1ftX4jcglPxgFCMJmZ2PLtSbJ2Peg6TmpJFTbe9GZYOQCDPdMYu/Tm0/bGZkw8paZnJY45J4K2PZrLYq8g==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -3605,7 +3615,7 @@ packages:
     resolution: {directory: src/arrpc, type: directory}
     name: arrpc
     dependencies:
-      ws: 8.13.0
+      ws: 8.14.2
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -3617,15 +3627,15 @@ packages:
     version: 3.5.0
     dependencies:
       cli-truncate: 2.1.0
-      electron-dl: 3.5.0
+      electron-dl: 3.5.1
       electron-is-dev: 2.0.0
     dev: false
 
-  github.com/dmitmel/eslint-config-dmitmel/690f1b1121d342fcc8ee511ca9f2af7502f53db6(eslint@8.51.0):
-    resolution: {tarball: https://codeload.github.com/dmitmel/eslint-config-dmitmel/tar.gz/690f1b1121d342fcc8ee511ca9f2af7502f53db6}
-    id: github.com/dmitmel/eslint-config-dmitmel/690f1b1121d342fcc8ee511ca9f2af7502f53db6
+  github.com/dmitmel/eslint-config-dmitmel/d97129ec35235415c6ae6a42299f55cdbb5d75fd(eslint@8.51.0):
+    resolution: {tarball: https://codeload.github.com/dmitmel/eslint-config-dmitmel/tar.gz/d97129ec35235415c6ae6a42299f55cdbb5d75fd}
+    id: github.com/dmitmel/eslint-config-dmitmel/d97129ec35235415c6ae6a42299f55cdbb5d75fd
     name: eslint-config-dmitmel
-    version: 8.2.2
+    version: 8.3.0
     engines: {node: '>=8.10.0'}
     peerDependencies:
       eslint: '>=8.17.0'
