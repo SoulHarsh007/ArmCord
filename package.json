@@ -7,22 +7,22 @@
     "node": ">=20.5.1"
   },
   "scripts": {
-    "build": "tsc && copyfiles -u 1 src/**/*.html src/**/**/*.css src/**/**/*.js ts-out/ && copyfiles package.json ts-out/ && copyfiles assets/**/** ts-out/ && npm run compress",
+    "build": "tsc && copyfiles -u 1 src/**/*.html src/**/**/*.css src/**/**/*.js ts-out/ && copyfiles package.json ts-out/ && copyfiles assets/**/** ts-out/ && bun run compress",
     "watch": "tsc -w",
-    "compress": "echo 'Compressing files. This may take some time...' && npm run compresscss && npm run compressjs && npm run compresshtml && npm run compressjson",
+    "compress": "echo 'Compressing files. This may take some time...' && bun run compresscss && bun run compressjs && bun run compresshtml && bun run compressjson",
     "compresscss": "find ts-out -name '*.css' ! -name 'css_' -print0 | xargs -0 -I {} node-minify -c clean-css -O2 -i {} -o {}",
     "compressjs": "find ts-out -name '*.js' ! -name 'js_' -print0 | xargs -0 -I {} node-minify -c terser -i {} -o {}",
     "compresshtml": "find ts-out -name '*.html' ! -name 'html_' -print0 | xargs -0 -I {} node-minify -c html-minifier -i {} -o {}",
     "compressjson": "find ts-out -name '*.json' ! -name 'json_' -print0 | xargs -0 -I {} node-minify -c jsonminify -i {} -o {}",
-    "start": "npm run build && electron ./ts-out/main.js",
-    "startThemeManager": "npm run build && electron ./ts-out/main.js themes",
-    "startKeybindManager": "npm run build && electron ./ts-out/main.js keybinds",
-    "startWayland": "npm run build && electron ./ts-out/main.js --ozone-platform-hint=auto --enable-features=WebRTCPipeWireCapturer,WaylandWindowDecorations",
-    "package": "npm run build && electron-builder",
-    "packageQuick": "npm run build && electron-builder --dir",
+    "start": "bun run build && electron ./ts-out/main.js",
+    "startThemeManager": "bun run build && electron ./ts-out/main.js themes",
+    "startKeybindManager": "bun run build && electron ./ts-out/main.js keybinds",
+    "startWayland": "bun run build && electron ./ts-out/main.js --ozone-platform-hint=auto --enable-features=WebRTCPipeWireCapturer,WaylandWindowDecorations",
+    "package": "bun run build && electron-builder",
+    "packageQuick": "bun run build && electron-builder --dir",
     "format": "prettier --write src *.json",
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore",
-    "CIbuild": "npm run build && electron-builder --linux zip && electron-builder --windows zip && electron-builder --macos zip",
+    "CIbuild": "bun run build && electron-builder --linux zip && electron-builder --windows zip && electron-builder --macos zip",
     "prepare": "git config --local core.hooksPath .hooks/"
   },
   "repository": {
@@ -51,14 +51,14 @@
     "eslint-config-dmitmel": "github:dmitmel/eslint-config-dmitmel",
     "eslint-plugin-prettier": "^5.0.0",
     "prettier": "^3.0.3",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "bun-types": "latest"
   },
   "dependencies": {
     "arrpc": "file:src/arrpc",
     "cross-fetch": "^4.0.0",
     "electron-context-menu": "github:ArmCord/electron-context-menu",
     "extract-zip": "^2.0.1",
-    "pnpm": "^8.9.0",
     "v8-compile-cache": "^2.4.0"
   },
   "build": {
@@ -93,7 +93,6 @@
       ]
     }
   },
-  "packageManager": "pnpm@8.9.0",
   "overrides": {
     "@types/cacheable-request": "8.3.1"
   }

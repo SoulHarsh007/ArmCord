@@ -1,17 +1,18 @@
 {
   "include": ["src/**/*"],
   "compilerOptions": {
-    "outDir": "ts-out",
+    "lib": ["ESNext"],
     "module": "CommonJS",
-    "strict": true,
+    "target": "ESNext",
+    "moduleDetection": "force",
+    "downlevelIteration": true,
+    "skipLibCheck": true,
     "esModuleInterop": true,
-    "lib": ["ES2023"],
-    "resolveJsonModule": true,
-    "declaration": true,
-    "declarationMap": true,
-    "declarationDir": "typings",
-    "target": "esnext",
-    "importHelpers": false,
-    "skipLibCheck": true
+    "jsx": "preserve",
+    "allowJs": true,
+    "outDir": "ts-out",
+    "types": [
+      "bun-types" // add Bun global
+    ]
   }
 }
