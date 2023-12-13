@@ -184,7 +184,7 @@ export function registerIpc(): void {
     event.returnValue = await getLangName();
   });
   ipcMain.on('crash', async () => {
-    process.crash();
+    process.exit(1);
   });
   ipcMain.handle('getSetting', (_event, toGet: keyof Settings) => {
     return getConfig(toGet);
