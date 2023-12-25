@@ -20,9 +20,9 @@ import { createSettingsWindow } from './settings/main';
 export let tray: any = null;
 let trayIcon = 'ac_plug_colored';
 app.whenReady().then(async () => {
-  let finishedSetup = await getConfig('doneSetup');
-  if ((await getConfig('trayIcon')) != 'default') {
-    trayIcon = await getConfig('trayIcon');
+  let finishedSetup = getConfig('doneSetup');
+  if (getConfig('trayIcon') != 'default') {
+    trayIcon = getConfig('trayIcon');
   }
   let trayPath = nativeImage.createFromPath(
     path.join(__dirname, '../', `/assets/${trayIcon}.png`)
@@ -41,8 +41,8 @@ app.whenReady().then(async () => {
 
   if (process.platform == 'darwin' && trayPath.getSize().height > 22)
     trayPath = trayPath.resize({ height: 22 });
-  if (await getConfig('tray')) {
-    let clientName = (await getConfig('clientName')) ?? 'ArmCord';
+  if (getConfig('tray')) {
+    let clientName = getConfig('clientName') ?? 'ArmCord';
     tray = new Tray(trayPath);
     if (finishedSetup == false) {
       const contextMenu = Menu.buildFromTemplate([
@@ -53,7 +53,7 @@ app.whenReady().then(async () => {
         {
           label: `Quit ${clientName}`,
           async click() {
-            fs.unlink(await getConfigLocation(), (err) => {
+            fs.unlink(getConfigLocation(), (err) => {
               if (err) throw err;
 
               console.log('Closed during setup. "settings.json" was deleted');
@@ -108,7 +108,7 @@ app.whenReady().then(async () => {
       mainWindow.show();
     });
   } else {
-    if ((await getConfig('tray')) == undefined) {
+    if (getConfig('tray') == undefined) {
       if (process.platform == 'linux') {
         const options: MessageBoxOptions = {
           type: 'question',

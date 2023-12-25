@@ -7,7 +7,13 @@ import {
   nativeImage,
   shell,
 } from 'electron';
-import { mainWindow } from './window';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import { customTitlebar } from './main';
+import { createSettingsWindow } from './settings/main';
+import { splashWindow } from './splash/main';
+import { createTManagerWindow } from './themeManager/main';
 import {
   Settings,
   getConfig,
@@ -16,20 +22,13 @@ import {
   getLang,
   getLangName,
   getVersion,
-  getWindowState,
   modInstallState,
   packageVersion,
   setConfigBulk,
   setLang,
   sleep,
 } from './utils';
-import { customTitlebar } from './main';
-import { createSettingsWindow } from './settings/main';
-import os from 'os';
-import fs from 'fs';
-import path from 'path';
-import { createTManagerWindow } from './themeManager/main';
-import { splashWindow } from './splash/main';
+import { mainWindow } from './window';
 const userDataPath = app.getPath('userData');
 const storagePath = path.join(userDataPath, '/storage/');
 const themesPath = path.join(userDataPath, '/themes/');
@@ -49,7 +48,8 @@ export function registerIpc(): void {
   });
   ipcMain.on('setPing', (_event, pingCount: number) => {
     switch (os.platform()) {
-      case 'linux' ?? 'macos':
+      case 'darwin':
+      case 'linux':
         app.setBadgeCount(pingCount);
         break;
       case 'win32':
@@ -100,9 +100,9 @@ export function registerIpc(): void {
   ipcMain.on('get-package-version', (event) => {
     event.returnValue = packageVersion;
   });
-  ipcMain.on('splashEnd', async () => {
+  ipcMain.on('splashEnd', () => {
     splashWindow.close();
-    if (await getConfig('startMinimized')) {
+    if (getConfig('startMinimized')) {
       mainWindow.hide();
     } else {
       mainWindow.show();
@@ -110,37 +110,37 @@ export function registerIpc(): void {
   });
   ipcMain.on('restart', () => {
     app.relaunch();
-    app.exit();
+    app.exit(0);
   });
   ipcMain.on('saveSettings', (_event, args) => {
     setConfigBulk(args);
   });
-  ipcMain.on('minimizeToTray', async (event) => {
-    event.returnValue = await getConfig('minimizeToTray');
+  ipcMain.on('minimizeToTray', (event) => {
+    event.returnValue = getConfig('minimizeToTray');
   });
-  ipcMain.on('channel', async (event) => {
-    event.returnValue = await getConfig('channel');
+  ipcMain.on('channel', (event) => {
+    event.returnValue = getConfig('channel');
   });
-  ipcMain.on('clientmod', async (event) => {
-    event.returnValue = await getConfig('mods');
+  ipcMain.on('clientmod', (event) => {
+    event.returnValue = getConfig('mods');
   });
-  ipcMain.on('legacyCapturer', async (event) => {
-    event.returnValue = await getConfig('useLegacyCapturer');
+  ipcMain.on('legacyCapturer', (event) => {
+    event.returnValue = getConfig('useLegacyCapturer');
   });
-  ipcMain.on('trayIcon', async (event) => {
-    event.returnValue = await getConfig('trayIcon');
+  ipcMain.on('trayIcon', (event) => {
+    event.returnValue = getConfig('trayIcon');
   });
-  ipcMain.on('disableAutogain', async (event) => {
-    event.returnValue = await getConfig('disableAutogain');
+  ipcMain.on('disableAutogain', (event) => {
+    event.returnValue = getConfig('disableAutogain');
   });
   ipcMain.on('titlebar', (event) => {
     event.returnValue = customTitlebar;
   });
-  ipcMain.on('mobileMode', async (event) => {
-    event.returnValue = await getConfig('mobileMode');
+  ipcMain.on('mobileMode', (event) => {
+    event.returnValue = getConfig('mobileMode');
   });
-  ipcMain.on('shouldPatch', async (event) => {
-    event.returnValue = await getConfig('automaticPatches');
+  ipcMain.on('shouldPatch', (event) => {
+    event.returnValue = getConfig('automaticPatches');
   });
   ipcMain.on('openSettingsWindow', () => {
     createSettingsWindow();
@@ -148,8 +148,8 @@ export function registerIpc(): void {
   ipcMain.on('openManagerWindow', () => {
     createTManagerWindow();
   });
-  ipcMain.on('setting-armcordCSP', async (event) => {
-    if (await getConfig('armcordCSP')) {
+  ipcMain.on('setting-armcordCSP', (event) => {
+    if (getConfig('armcordCSP')) {
       event.returnValue = true;
     } else {
       event.returnValue = false;
@@ -183,7 +183,7 @@ export function registerIpc(): void {
   ipcMain.on('getLangName', async (event) => {
     event.returnValue = await getLangName();
   });
-  ipcMain.on('crash', async () => {
+  ipcMain.on('crash', () => {
     process.exit(1);
   });
   ipcMain.handle('getSetting', (_event, toGet: keyof Settings) => {

@@ -67,7 +67,7 @@ contextBridge.exposeInMainWorld('ArmCordRPC', {
     windowCallback = callback;
   },
 });
-ipcRenderer.on("rpc", (_event, data: object) => {
-    console.log(data);
-    windowCallback(data);
+ipcRenderer.on('rpc', (_event, data: object) => {
+  console.log(data);
+  windowCallback(data);
 });

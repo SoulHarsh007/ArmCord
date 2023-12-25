@@ -8,13 +8,13 @@ const unstrictCSP = (): void => {
     ({ responseHeaders, resourceType }, done) => {
       if (!responseHeaders) return done({});
 
-        if (resourceType === "mainFrame") {
-            delete responseHeaders["content-security-policy"];
-        } else if (resourceType === "stylesheet") {
-            // Fix hosts that don't properly set the css content type, such as
-            // raw.githubusercontent.com
-            responseHeaders["content-type"] = ["text/css"];
-        }
+      if (resourceType === 'mainFrame') {
+        delete responseHeaders['content-security-policy'];
+      } else if (resourceType === 'stylesheet') {
+        // Fix hosts that don't properly set the css content type, such as
+        // raw.githubusercontent.com
+        responseHeaders['content-type'] = ['text/css'];
+      }
 
       return done({ responseHeaders });
     }
@@ -22,7 +22,7 @@ const unstrictCSP = (): void => {
 };
 
 electron.app.whenReady().then(async () => {
-  if (await getConfig('armcordCSP')) {
+  if (getConfig('armcordCSP')) {
     unstrictCSP();
   } else {
     console.log(

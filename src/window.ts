@@ -10,29 +10,24 @@ import {
   nativeImage,
   shell,
 } from 'electron';
+import contextMenu from 'electron-context-menu';
+import * as fs from 'fs';
+import os from 'os';
 import path from 'path';
+import { registerIpc } from './ipc';
+import { iconPath } from './main';
+import { setMenu } from './menu';
+import { tray } from './tray';
 import {
   checkIfConfigIsBroken,
   contentPath,
   firstRun,
   getConfig,
   getWindowState,
-  modInstallState,
   registerGlobalKeybinds,
   setConfig,
-  setLang,
   setWindowState,
-  sleep,
-  transparency,
 } from './utils';
-import { registerIpc } from './ipc';
-import { setMenu } from './menu';
-import * as fs from 'fs';
-import contextMenu from 'electron-context-menu';
-import os from 'os';
-import { tray } from './tray';
-import { iconPath } from './main';
-import { createSetupWindow } from './setup/main';
 export let mainWindow: BrowserWindow;
 export let inviteWindow: BrowserWindow;
 let forceQuit = false;
@@ -79,23 +74,23 @@ async function doAfterDefiningTheWindow(): Promise<void> {
     mainWindow.hide(); // please don't flashbang the user
   }
   if (
-    (await getConfig('windowStyle')) == 'transparency' &&
+    getConfig('windowStyle') === 'transparency' &&
     process.platform === 'win32'
   ) {
     mainWindow.setBackgroundMaterial('mica');
-    if ((await getConfig('startMinimized')) == false) {
+    if (getConfig('startMinimized') === false) {
       mainWindow.show();
     }
   }
-  let ignoreProtocolWarning = await getConfig('ignoreProtocolWarning');
+  let ignoreProtocolWarning = getConfig('ignoreProtocolWarning');
   await checkIfConfigIsBroken();
   registerIpc();
-  if (await getConfig('mobileMode')) {
+  if (getConfig('mobileMode')) {
     mainWindow.webContents.userAgent =
       'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.149 Mobile Safari/537.36';
   } else {
     // A little sloppy but it works :p
-    if (osType == 'Windows_NT') {
+    if (osType === 'Windows_NT') {
       osType = `Windows ${os.release().split('.')[0]} (${os.release()})`;
     }
     mainWindow.webContents.userAgent = `Mozilla/5.0 (X11; ${osType} ${os.arch()}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36`; //fake useragent for screenshare to work
@@ -167,7 +162,7 @@ async function doAfterDefiningTheWindow(): Promise<void> {
     }
     return { action: 'deny' };
   });
-  if ((await getConfig('useLegacyCapturer')) == false) {
+  if (getConfig('useLegacyCapturer') == false) {
     console.log('Starting screenshare module...');
     import('./screenshare/main');
   }
@@ -189,10 +184,7 @@ async function doAfterDefiningTheWindow(): Promise<void> {
     (_, callback) => callback({ cancel: true })
   );
 
-  if (
-    (await getConfig('trayIcon')) == 'default' ||
-    (await getConfig('dynamicIcon'))
-  ) {
+  if (getConfig('trayIcon') == 'default' || getConfig('dynamicIcon')) {
     mainWindow.webContents.on('page-favicon-updated', async () => {
       let faviconBase64 = await mainWindow.webContents.executeJavaScript(`
                 var getFavicon = function(){
@@ -225,12 +217,12 @@ async function doAfterDefiningTheWindow(): Promise<void> {
         trayPath = trayPath.resize({ height: 22 });
       if (process.platform === 'win32' && trayPath.getSize().height > 32)
         trayPath = trayPath.resize({ height: 32 });
-      if (await getConfig('tray')) {
-        if ((await getConfig('trayIcon')) == 'default') {
+      if (getConfig('tray')) {
+        if (getConfig('trayIcon') == 'default') {
           tray.setImage(trayPath);
         }
       }
-      if (await getConfig('dynamicIcon')) {
+      if (getConfig('dynamicIcon')) {
         mainWindow.setIcon(trayPath);
       }
     });
@@ -306,10 +298,10 @@ async function doAfterDefiningTheWindow(): Promise<void> {
         x: mainWindow.getPosition()[0],
         y: mainWindow.getPosition()[1],
       });
-      if (await getConfig('minimizeToTray')) {
+      if (getConfig('minimizeToTray')) {
         e.preventDefault();
         mainWindow.hide();
-      } else if (!(await getConfig('minimizeToTray'))) {
+      } else if (!getConfig('minimizeToTray')) {
         e.preventDefault();
         app.quit();
       }
@@ -346,7 +338,7 @@ async function doAfterDefiningTheWindow(): Promise<void> {
     );
   });
   console.log(contentPath);
-  if ((await getConfig('inviteWebsocket')) == true) {
+  if (getConfig('inviteWebsocket') == true) {
     require('arrpc');
     //await startServer();
   }
@@ -372,7 +364,7 @@ async function doAfterDefiningTheWindow(): Promise<void> {
                     window.location.replace("https://discord.com/app");
             }
             `);
-  if (await getConfig('skipSplash')) {
+  if (getConfig('skipSplash')) {
     mainWindow.show();
   }
 }
@@ -393,7 +385,7 @@ export async function createCustomWindow(): Promise<void> {
       webviewTag: true,
       sandbox: false,
       preload: path.join(__dirname, 'preload/preload.js'),
-      spellcheck: await getConfig('spellcheck'),
+      spellcheck: getConfig('spellcheck'),
     },
   });
   doAfterDefiningTheWindow();
@@ -415,7 +407,7 @@ export async function createNativeWindow(): Promise<void> {
       webviewTag: true,
       sandbox: false,
       preload: path.join(__dirname, 'preload/preload.js'),
-      spellcheck: await getConfig('spellcheck'),
+      spellcheck: getConfig('spellcheck'),
     },
   });
   doAfterDefiningTheWindow();
@@ -438,7 +430,7 @@ export async function createTransparentWindow(): Promise<void> {
       sandbox: false,
       webviewTag: true,
       preload: path.join(__dirname, 'preload/preload.js'),
-      spellcheck: await getConfig('spellcheck'),
+      spellcheck: getConfig('spellcheck'),
     },
   });
   doAfterDefiningTheWindow();
@@ -454,7 +446,7 @@ export async function createInviteWindow(code: string): Promise<void> {
     autoHideMenuBar: true,
     webPreferences: {
       sandbox: false,
-      spellcheck: await getConfig('spellcheck'),
+      spellcheck: getConfig('spellcheck'),
     },
   });
   let formInviteURL = `https://discord.com/invite/${code}`;

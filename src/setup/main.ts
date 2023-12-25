@@ -30,7 +30,7 @@ export function createSetupWindow(): void {
     event.returnValue = process.platform;
   });
   ipcMain.on('setup-quit', async () => {
-    fs.unlink(await getConfigLocation(), (err) => {
+    fs.unlink(getConfigLocation(), (err) => {
       if (err) throw err;
 
       console.log('Closed during setup. "settings.json" was deleted');

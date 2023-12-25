@@ -1,14 +1,14 @@
-import './bridge';
-import './patch';
-import './optimizer';
-import './settings';
 import { ipcRenderer } from 'electron';
 import * as fs from 'fs';
 import * as path from 'path';
 import { addScript, addStyle, sleep } from '../utils';
+import './bridge';
 import { injectMobileStuff } from './mobile';
-import { fixTitlebar, injectTitlebar } from './titlebar';
+import './optimizer';
+import './patch';
+import './settings';
 import { injectSettings } from './settings';
+import { fixTitlebar, injectTitlebar } from './titlebar';
 
 if (ipcRenderer.sendSync('legacyCapturer')) {
   console.warn('Using legacy capturer module');
@@ -79,43 +79,46 @@ sleep(5000).then(async () => {
 
 // Settings info version injection
 setInterval(() => {
-    const host = document.querySelector('[class*="sidebar"] [class*="info"]');
-    if (!host || host.querySelector("#ac-ver")) {
-        return;
-    }
+  const host = document.querySelector('[class*="sidebar"] [class*="info"]');
+  if (!host || host.querySelector('#ac-ver')) {
+    return;
+  }
 
-    const el = host.firstElementChild!.cloneNode() as HTMLSpanElement;
-    el.id = "ac-ver";
-    el.textContent = `ArmCord Version: ${version}`;
-    el.onclick = () => ipcRenderer.send("openSettingsWindow");
-    host.append(el);
-    let advanced = document
-        .querySelector('[class*="socialLinks"]')
-        ?.parentElement?.querySelector(
-            '[class*="header"] + [class*="item"] + [class*="item"] + [class*="item"] + [class*="item"] + [class*="item"] + [class*="item"] + [class*="item"] + [class*="item"] + [class*="item"]'
-        );
-    if (!advanced) return;
-    if (advanced.nextSibling instanceof Element && advanced.nextSibling.className.includes("item")) {
-        advanced = advanced.nextSibling;
-    }
-    const acSettings = advanced.cloneNode(true) as HTMLElement;
-    const tManager = advanced.cloneNode(true) as HTMLElement;
-    const fQuit = advanced.cloneNode(true) as HTMLElement;
-    const keybindMaker = advanced.cloneNode(true) as HTMLElement;
-    acSettings.textContent = "ArmCord Settings";
-    acSettings.id = "acSettings";
-    acSettings.onclick = () => injectSettings();
-    tManager.textContent = "Themes";
-    tManager.id = "acThemes";
-    tManager.onclick = () => ipcRenderer.send("openManagerWindow");
-    keybindMaker.textContent = "Global keybinds";
-    keybindMaker.id = "acKeybinds";
-    keybindMaker.onclick = () => ipcRenderer.send("openKeybindWindow");
-    fQuit.textContent = "Force Quit";
-    fQuit.id = "acForceQuit";
-    fQuit.onclick = () => ipcRenderer.send("win-quit");
-    advanced.insertAdjacentElement("afterend", acSettings);
-    advanced.insertAdjacentElement("afterend", tManager);
-    advanced.insertAdjacentElement("afterend", keybindMaker);
-    advanced.insertAdjacentElement("afterend", fQuit);
+  const el = host.firstElementChild!.cloneNode() as HTMLSpanElement;
+  el.id = 'ac-ver';
+  el.textContent = `ArmCord Version: ${version}`;
+  el.onclick = () => ipcRenderer.send('openSettingsWindow');
+  host.append(el);
+  let advanced = document
+    .querySelector('[class*="socialLinks"]')
+    ?.parentElement?.querySelector(
+      '[class*="header"] + [class*="item"] + [class*="item"] + [class*="item"] + [class*="item"] + [class*="item"] + [class*="item"] + [class*="item"] + [class*="item"] + [class*="item"]'
+    );
+  if (!advanced) return;
+  if (
+    advanced.nextSibling instanceof Element &&
+    advanced.nextSibling.className.includes('item')
+  ) {
+    advanced = advanced.nextSibling;
+  }
+  const acSettings = advanced.cloneNode(true) as HTMLElement;
+  const tManager = advanced.cloneNode(true) as HTMLElement;
+  const fQuit = advanced.cloneNode(true) as HTMLElement;
+  const keybindMaker = advanced.cloneNode(true) as HTMLElement;
+  acSettings.textContent = 'ArmCord Settings';
+  acSettings.id = 'acSettings';
+  acSettings.onclick = () => injectSettings();
+  tManager.textContent = 'Themes';
+  tManager.id = 'acThemes';
+  tManager.onclick = () => ipcRenderer.send('openManagerWindow');
+  keybindMaker.textContent = 'Global keybinds';
+  keybindMaker.id = 'acKeybinds';
+  keybindMaker.onclick = () => ipcRenderer.send('openKeybindWindow');
+  fQuit.textContent = 'Force Quit';
+  fQuit.id = 'acForceQuit';
+  fQuit.onclick = () => ipcRenderer.send('win-quit');
+  advanced.insertAdjacentElement('afterend', acSettings);
+  advanced.insertAdjacentElement('afterend', tManager);
+  advanced.insertAdjacentElement('afterend', keybindMaker);
+  advanced.insertAdjacentElement('afterend', fQuit);
 }, 1000);
