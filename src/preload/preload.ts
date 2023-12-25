@@ -10,8 +10,6 @@ import { injectMobileStuff } from './mobile';
 import { fixTitlebar, injectTitlebar } from './titlebar';
 import { injectSettings } from './settings';
 
-window.localStorage.setItem('hideNag', 'true');
-
 if (ipcRenderer.sendSync('legacyCapturer')) {
   console.warn('Using legacy capturer module');
   import('./capturer');
