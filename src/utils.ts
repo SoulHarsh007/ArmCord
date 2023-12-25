@@ -26,7 +26,7 @@ export async function sleep(ms: number): Promise<void> {
 }
 
 export async function checkIfConfigIsBroken(): Promise<void> {
-  if ((await getConfig('0')) == 'd') {
+  if (getConfig('0') == 'd') {
     console.log('Detected a corrupted config');
     setup();
     dialog.showErrorBox(
@@ -78,8 +78,8 @@ export function getVersion(): string {
 }
 export function getDisplayVersion(): string {
   //Checks if the app version # has 4 sections (3.1.0.0) instead of 3 (3.1.0) / Shitty way to check if Kernel Mod is installed
-  if ((app.getVersion() == packageVersion) == false) {
-    if ((app.getVersion() == process.versions.electron) == true) {
+  if ((app.getVersion() === packageVersion) === false) {
+    if ((app.getVersion() === process.versions.electron) === true) {
       return `Dev Build (${packageVersion})`;
     } else {
       return `${packageVersion} [Modified]`;
@@ -124,7 +124,7 @@ export async function injectElectronFlags(): Promise<void> {
     battery:
       '--enable-features=TurnOffStreamingMediaCachingOnBattery --force_low_power_gpu', // Known to have better battery life for Chromium?
   };
-  switch (await getConfig('performanceMode')) {
+  switch (getConfig('performanceMode')) {
     case 'performance':
       console.log('Performance mode enabled');
       app.commandLine.appendSwitch(presets.performance);
@@ -137,7 +137,7 @@ export async function injectElectronFlags(): Promise<void> {
       console.log('No performance modes set');
   }
   if (
-    (await getConfig('windowStyle')) == 'transparent' &&
+    getConfig('windowStyle') == 'transparent' &&
     process.platform === 'win32'
   ) {
     transparency = true;
@@ -287,15 +287,7 @@ export function getConfigLocation(): string {
   const storagePath = path.join(userDataPath, '/storage/');
   return `${storagePath}settings.json`;
 }
-export async function getConfig<K extends keyof Settings>(
-  object: K
-): Promise<Settings[K]> {
-  let rawdata = fs.readFileSync(getConfigLocation(), 'utf-8');
-  let returndata = JSON.parse(rawdata);
-  console.log(`[Config manager] ${object}: ${returndata[object]}`);
-  return returndata[object];
-}
-export function getConfigSync<K extends keyof Settings>(object: K) {
+export function getConfig<K extends keyof Settings>(object: K): Settings[K] {
   let rawdata = fs.readFileSync(getConfigLocation(), 'utf-8');
   let returndata = JSON.parse(rawdata);
   console.log(`[Config manager] ${object}: ${returndata[object]}`);
@@ -338,7 +330,7 @@ export async function checkIfConfigExists(): Promise<void> {
     console.log('First run of the ArmCord. Starting setup.');
     setup();
     firstRun = true;
-  } else if ((await getConfig('doneSetup')) == false) {
+  } else if (getConfig('doneSetup') == false) {
     console.log('First run of the ArmCord. Starting setup.');
     setup();
     firstRun = true;
@@ -349,22 +341,22 @@ export async function checkIfConfigExists(): Promise<void> {
 
 // Mods
 async function updateModBundle(): Promise<void> {
-  if ((await getConfig('noBundleUpdates')) == undefined ?? false) {
+  if (getConfig('noBundleUpdates') == undefined ?? false) {
     try {
       console.log('Downloading mod bundle');
       const distFolder = `${app.getPath('userData')}/plugins/loader/dist/`;
       while (!fs.existsSync(distFolder)) {
         //waiting
       }
-      let name: string = await getConfig('mods');
+      let name: string = getConfig('mods');
       if (name == 'custom') {
         // aspy fix
         let bundle: string = await (
-          await fetch(await getConfig('customJsBundle'))
+          await fetch(getConfig('customJsBundle'))
         ).text();
         fs.writeFileSync(`${distFolder}bundle.js`, bundle, 'utf-8');
         let css: string = await (
-          await fetch(await getConfig('customCssBundle'))
+          await fetch(getConfig('customCssBundle'))
         ).text();
         fs.writeFileSync(`${distFolder}bundle.css`, css, 'utf-8');
       } else {
@@ -404,7 +396,7 @@ async function updateModBundle(): Promise<void> {
 
 export let modInstallState: string;
 export async function installModLoader(): Promise<void> {
-  if ((await getConfig('mods')) == 'none') {
+  if (getConfig('mods') == 'none') {
     modInstallState = 'none';
     fs.rmSync(`${app.getPath('userData')}/plugins/loader`, {
       recursive: true,
@@ -458,7 +450,7 @@ export async function installModLoader(): Promise<void> {
 }
 
 export async function registerGlobalKeybinds(): Promise<void> {
-  const keybinds = await getConfig('keybinds');
+  const keybinds = getConfig('keybinds');
   keybinds.forEach((keybind) => {
     globalShortcut.register(keybind, () => {
       console.log(keybind);

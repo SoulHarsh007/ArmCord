@@ -55,8 +55,7 @@ export interface Settings {
     clientName: string;
 }
 export declare function getConfigLocation(): string;
-export declare function getConfig<K extends keyof Settings>(object: K): Promise<Settings[K]>;
-export declare function getConfigSync<K extends keyof Settings>(object: K): any;
+export declare function getConfig<K extends keyof Settings>(object: K): Settings[K];
 export declare function setConfig<K extends keyof Settings>(object: K, toSet: Settings[K]): Promise<void>;
 export declare function setConfigBulk(object: Settings): Promise<void>;
 export declare function checkIfConfigExists(): Promise<void>;

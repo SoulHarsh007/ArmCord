@@ -12,7 +12,7 @@ function paste(contents: any): void {
   contents.paste();
 }
 export async function setMenu(): Promise<void> {
-  if ((await getConfig('alternativePaste')) == true) {
+  if (getConfig('alternativePaste') === true) {
     mainWindow.on('focus', function () {
       console.log('[Window state manager] Focus');
       globalShortcut.register('CmdOrCtrl+V', function () {

@@ -1,33 +1,29 @@
 import { app, BrowserWindow, crashReporter, session } from 'electron';
-import 'v8-compile-cache';
 import path from 'path';
+import 'v8-compile-cache';
 
 import {
-  Settings,
   checkForDataFolder,
   checkIfConfigExists,
   firstRun,
   getConfig,
-  getConfigSync,
   injectElectronFlags,
   installModLoader,
   setConfig,
   setLang,
-  setWindowState,
-  sleep,
+  Settings,
 } from './utils';
 
 import './extensions/mods';
+import { createSetupWindow } from './setup/main';
+import { createSplashWindow } from './splash/main';
+import { createTManagerWindow } from './themeManager/main';
 import './tray';
 import {
   createCustomWindow,
   createNativeWindow,
   createTransparentWindow,
-  mainWindow,
 } from './window';
-import { createTManagerWindow } from './themeManager/main';
-import { createSplashWindow } from './splash/main';
-import { createSetupWindow } from './setup/main';
 
 export let iconPath: string;
 export let settings: any;
@@ -39,10 +35,7 @@ app.on('render-process-gone', (event, webContents, details) => {
   }
 });
 
-if (
-  !app.requestSingleInstanceLock() &&
-  getConfigSync('multiInstance') === false
-) {
+if (!app.requestSingleInstanceLock() && getConfig('multiInstance') === false) {
   app.quit();
 } else {
   app.commandLine.appendSwitch('disable-features', 'WidgetLayering');
@@ -67,14 +60,14 @@ if (
   injectElectronFlags();
 
   app.whenReady().then(async () => {
-    if ((await getConfig('customIcon')) !== undefined || null) {
-      iconPath = await getConfig('customIcon');
+    if (getConfig('customIcon') !== undefined || null) {
+      iconPath = getConfig('customIcon');
     } else {
       iconPath = path.join(__dirname, '../', '/assets/desktop.png');
     }
 
     async function init(): Promise<void> {
-      if (!(await getConfig('skipSplash'))) {
+      if (!getConfig('skipSplash')) {
         createSplashWindow();
       }
       if (firstRun) {
@@ -82,7 +75,7 @@ if (
         createSetupWindow();
       }
 
-      switch (await getConfig('windowStyle')) {
+      switch (getConfig('windowStyle')) {
         case 'native':
           createNativeWindow();
           break;
@@ -120,19 +113,15 @@ if (
     }
     const args = process.argv[argNum];
     if (args && !args.startsWith('--')) {
-      switch (args) {
-        case 'themes':
-          createTManagerWindow();
-          break;
-        default:
-          if (args.includes('=')) {
-            const [key, value] = args.split('=');
-            await setConfig(key as keyof Settings, value);
-            console.log(`Setting ${key} to ${value}`);
-            app.relaunch();
-            app.exit();
-          }
-          break;
+      if (args === 'themes') {
+        createTManagerWindow();
+      }
+      if (args.includes('=')) {
+        const [key, value] = args.split('=');
+        await setConfig(key as keyof Settings, value);
+        console.log(`Setting ${key} to ${value}`);
+        app.relaunch();
+        app.exit();
       }
     }
   });
