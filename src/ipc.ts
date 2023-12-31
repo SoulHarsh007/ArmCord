@@ -47,22 +47,7 @@ export function registerIpc(): void {
     shell.openExternal(href);
   });
   ipcMain.on('setPing', (_event, pingCount: number) => {
-    switch (os.platform()) {
-      case 'darwin':
-      case 'linux':
-        app.setBadgeCount(pingCount);
-        break;
-      case 'win32':
-        if (pingCount > 0) {
-          let image = nativeImage.createFromPath(
-            path.join(__dirname, '../', `/assets/ping.png`)
-          );
-          mainWindow.setOverlayIcon(image, 'badgeCount');
-        } else {
-          mainWindow.setOverlayIcon(null, 'badgeCount');
-        }
-        break;
-    }
+    app.setBadgeCount(pingCount);
   });
   ipcMain.on('win-maximize', () => {
     mainWindow.maximize();

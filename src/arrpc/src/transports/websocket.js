@@ -9,9 +9,9 @@ const { WebSocketServer } = require('ws');
 const { createServer } = require('http');
 const { parse } = require('querystring');
 
-const portRange = [6463, 6472]; // ports available/possible: 6463-6472
+const portRange = [6463, 6472];
 
-class WSServer {
+module.exports = class WSServer {
   constructor(handlers) {
     return (async () => {
       this.handlers = handlers;
@@ -23,14 +23,12 @@ class WSServer {
 
       let http, wss;
       while (port <= portRange[1]) {
-        log('trying port', port);
+        if (process.env.ARRPC_DEBUG) log('trying port', port);
 
         if (
           await new Promise((res) => {
             http = createServer();
             http.on('error', (e) => {
-              // log('http error', e);
-
               if (e.code === 'EADDRINUSE') {
                 log(port, 'in use!');
                 res(false);
@@ -39,7 +37,7 @@ class WSServer {
 
             wss = new WebSocketServer({ server: http });
             wss.on('error', (e) => {
-              // log('wss error', e);
+              // no-op
             });
 
             wss.on('connection', this.onConnection);
@@ -64,13 +62,18 @@ class WSServer {
 
   onConnection(socket, req) {
     const params = parse(req.url.split('?')[1]);
-    const ver = parseInt(params.v ?? 1);
-    const encoding = params.encoding ?? 'json'; // json | etf (erlpack)
+    const ver = parseInt(params.v ?? 1, 10);
+    const encoding = params.encoding ?? 'json';
     const clientId = params.client_id ?? '';
 
     const origin = req.headers.origin ?? '';
 
-    log(`new connection! origin:`, origin, JSON.parse(JSON.stringify(params)));
+    if (process.env.ARRPC_DEBUG)
+      log(
+        `new connection! origin:`,
+        origin,
+        JSON.parse(JSON.stringify(params))
+      );
 
     if (
       origin !== '' &&
@@ -78,7 +81,6 @@ class WSServer {
         'https://discord.com',
         'https://ptb.discord.com',
         'https://canary.discord.com',
-        'https://replugged.dev',
       ].includes(origin)
     ) {
       log('disallowed origin', origin);
@@ -101,13 +103,6 @@ class WSServer {
       return;
     }
 
-    /* if (clientId === '') {
-      log('client id required');
-
-      socket.close();
-      return;
-    } */
-
     socket.clientId = clientId;
     socket.encoding = encoding;
 
@@ -124,7 +119,7 @@ class WSServer {
 
     socket._send = socket.send;
     socket.send = (msg) => {
-      log('sending', msg);
+      if (process.env.ARRPC_DEBUG) log('sending', msg);
       socket._send(JSON.stringify(msg));
     };
 
@@ -132,8 +127,7 @@ class WSServer {
   }
 
   onMessage(socket, msg) {
-    log('message', JSON.parse(msg));
+    if (process.env.ARRPC_DEBUG) log('message', JSON.parse(msg));
     this.handlers.message(socket, JSON.parse(msg));
   }
-}
-module.exports = WSServer;
+};

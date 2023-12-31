@@ -1,8 +1,8 @@
-import * as fs from 'fs';
-import { app, dialog, globalShortcut } from 'electron';
-import path from 'path';
 import fetch from 'cross-fetch';
+import { app, dialog, globalShortcut } from 'electron';
 import extract from 'extract-zip';
+import * as fs from 'fs';
+import path from 'path';
 import util from 'util';
 const streamPipeline = util.promisify(require('stream').pipeline);
 export let firstRun: boolean;
@@ -135,12 +135,6 @@ export async function injectElectronFlags(): Promise<void> {
       break;
     default:
       console.log('No performance modes set');
-  }
-  if (
-    getConfig('windowStyle') == 'transparent' &&
-    process.platform === 'win32'
-  ) {
-    transparency = true;
   }
 }
 export async function setLang(language: string): Promise<void> {
@@ -330,7 +324,7 @@ export async function checkIfConfigExists(): Promise<void> {
     console.log('First run of the ArmCord. Starting setup.');
     setup();
     firstRun = true;
-  } else if (getConfig('doneSetup') == false) {
+  } else if (getConfig('doneSetup') === false) {
     console.log('First run of the ArmCord. Starting setup.');
     setup();
     firstRun = true;
@@ -341,7 +335,7 @@ export async function checkIfConfigExists(): Promise<void> {
 
 // Mods
 async function updateModBundle(): Promise<void> {
-  if (getConfig('noBundleUpdates') == undefined ?? false) {
+  if (!getConfig('noBundleUpdates')) {
     try {
       console.log('Downloading mod bundle');
       const distFolder = `${app.getPath('userData')}/plugins/loader/dist/`;

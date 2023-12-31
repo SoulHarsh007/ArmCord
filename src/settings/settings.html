@@ -410,14 +410,12 @@
     const elements = document.querySelectorAll('[data-setting]');
     elements.forEach(async (e) => {
       const value = await settings.get(e.dataset.setting);
-      if (e.tagName == 'SELECT') e.value = value;
+      if (e.tagName === 'SELECT') e.value = value;
       else e.checked = value;
     });
-    if (settings.os !== 'win32') {
-      document.querySelectorAll('[windows-exclusive]').forEach(async (el) => {
-        el.disabled = true;
-      });
-    }
+    document.querySelectorAll('[windows-exclusive]').forEach(async (el) => {
+      el.disabled = true;
+    });
     function saveSettings() {
       const elements = Array.from(document.querySelectorAll('[data-setting]'));
       const obj = Object.fromEntries(
