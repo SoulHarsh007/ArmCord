@@ -89,7 +89,7 @@ export function registerIpc(): void {
     splashWindow.close();
     if (getConfig('startMinimized')) {
       mainWindow.hide();
-    } else {
+    } else if (!mainWindow.isDestroyed()) {
       mainWindow.show();
     }
   });
