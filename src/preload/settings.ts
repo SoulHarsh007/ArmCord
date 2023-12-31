@@ -1,15 +1,18 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { addStyle } from '../utils';
+import { addStyle } from '../utils.js';
 import { WebviewTag } from 'electron';
-var html = `
+import { fileURLToPath } from 'url';
+let html = `
 <div id="ACsettingsModal" class="ACsettings-modal">
 <span class="close" id="closeSettings">&times;</span>
 <div class="ACsettings-modal-content" id="webviewSettingsContainer">
 </div>
 </div>`;
 
-var webview = `<webview src="${path.join(
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+let webview = `<webview src="${path.join(
   'file://',
   __dirname,
   '../',
@@ -18,7 +21,7 @@ var webview = `<webview src="${path.join(
   'file://',
   __dirname,
   '../',
-  '/settings/preload.js'
+  '/settings/preload.mjs'
 )}" id="inAppSettings"></webview>`;
 export function injectSettings() {
   document.getElementById('webviewSettingsContainer')!.innerHTML = webview;

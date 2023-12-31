@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { injectTitlebar } from './titlebar';
+import { injectTitlebar } from './titlebar.js';
 const CANCEL_ID = 'desktop-capturer-selection__cancel';
 const desktopCapturer = {
   getSources: (opts: any) =>

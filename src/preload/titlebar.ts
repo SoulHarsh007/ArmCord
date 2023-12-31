@@ -1,8 +1,12 @@
 import { ipcRenderer } from 'electron';
-import { addStyle } from '../utils';
+import { addStyle } from '../utils.js';
 import * as fs from 'fs';
 import * as path from 'path';
 import os from 'os';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 export function injectTitlebar(): void {
   document.addEventListener('DOMContentLoaded', function (_event) {
     const elem = document.createElement('div');

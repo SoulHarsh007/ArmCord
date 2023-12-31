@@ -1,8 +1,12 @@
 import { BrowserWindow, app, dialog, ipcMain, shell } from 'electron';
-import { sleep } from '../utils';
+import { sleep } from '../utils.js';
 import path from 'path';
 import fs from 'fs';
-import { createInviteWindow, mainWindow } from '../window';
+import { createInviteWindow, mainWindow } from '../window.js';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 let themeWindow: BrowserWindow;
 let instance = 0;
 interface ThemeManifest {
@@ -107,7 +111,7 @@ export function createTManagerWindow(): void {
       autoHideMenuBar: true,
       webPreferences: {
         sandbox: false,
-        preload: path.join(__dirname, 'preload.js'),
+        preload: path.join(__dirname, 'preload.mjs'),
       },
     });
     //setWindowHandler doesn't work for some reason

@@ -3,11 +3,13 @@
   "version": "3.3.0",
   "description": "ArmCord is a custom client designed to enhance your Discord experience while keeping everything lightweight.",
   "main": "ts-out/main.js",
+  "type": "module",
   "engines": {
     "node": ">=20.5.1"
   },
   "scripts": {
     "build": "tsc && copyfiles -u 1 src/**/*.html src/**/**/*.css src/**/**/*.js ts-out/ && copyfiles package.json ts-out/ && copyfiles assets/**/** ts-out/ && bun run compress",
+    "dev": "tsc && copyfiles -u 1 src/**/*.html src/**/**/*.css src/**/**/*.js ts-out/ && copyfiles package.json ts-out/ && copyfiles assets/**/** ts-out/ && electron ./ts-out/main.js",
     "watch": "tsc -w",
     "compress": "echo 'Compressing files. This may take some time...' && bun run compresscss && bun run compressjs && bun run compresshtml && bun run compressjson",
     "compresscss": "find ts-out -name '*.css' ! -name 'css_' -print0 | xargs -0 -I {} node-minify -c clean-css -O2 -i {} -o {}",
@@ -40,7 +42,7 @@
     "@node-minify/html-minifier": "8.0.6",
     "@node-minify/jsonminify": "8.0.6",
     "@node-minify/terser": "8.0.6",
-    "@types/node": "20.10.5",
+    "@types/node": "20.10.6",
     "@typescript-eslint/eslint-plugin": "6.16.0",
     "@typescript-eslint/parser": "6.16.0",
     "copyfiles": "2.4.1",
@@ -54,7 +56,7 @@
     "bun-types": "latest"
   },
   "dependencies": {
-    "arrpc": "file:src/arrpc",
+    "arrpc": "github:OpenAsar/arrpc",
     "cross-fetch": "4.0.0",
     "electron-context-menu": "github:ArmCord/electron-context-menu",
     "extract-zip": "2.0.1",

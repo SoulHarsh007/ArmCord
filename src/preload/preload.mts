@@ -1,18 +1,21 @@
 import { ipcRenderer } from 'electron';
 import * as fs from 'fs';
 import * as path from 'path';
-import { addScript, addStyle, sleep } from '../utils';
-import './bridge';
-import { injectMobileStuff } from './mobile';
-import './optimizer';
-import './patch';
-import './settings';
-import { injectSettings } from './settings';
-import { fixTitlebar, injectTitlebar } from './titlebar';
+import { addScript, addStyle, sleep } from '../utils.js';
+import './bridge.js';
+import { injectMobileStuff } from './mobile.js';
+import './optimizer.js';
+import './patch.js';
+import './settings.js';
+import { injectSettings } from './settings.js';
+import { fixTitlebar, injectTitlebar } from './titlebar.js';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 if (ipcRenderer.sendSync('legacyCapturer')) {
   console.warn('Using legacy capturer module');
-  import('./capturer');
+  import('./capturer.js');
 }
 
 const version = ipcRenderer.sendSync('displayVersion');

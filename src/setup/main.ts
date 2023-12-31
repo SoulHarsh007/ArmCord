@@ -1,8 +1,12 @@
 import { BrowserWindow, app, ipcMain } from 'electron';
-import path from 'path';
 import * as fs from 'fs';
-import { iconPath } from '../main';
-import { Settings, getConfigLocation, setConfigBulk } from '../utils';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { iconPath } from '../main.js';
+import { Settings, getConfigLocation, setConfigBulk } from '../utils.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 let setupWindow: BrowserWindow;
 export function createSetupWindow(): void {
   setupWindow = new BrowserWindow({
@@ -16,7 +20,7 @@ export function createSetupWindow(): void {
     webPreferences: {
       sandbox: false,
       spellcheck: false,
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'preload.mjs'),
     },
   });
   ipcMain.on('saveSettings', (_event, args: Settings) => {

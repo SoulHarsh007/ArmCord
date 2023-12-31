@@ -7,16 +7,19 @@ import {
   dialog,
   nativeImage,
 } from 'electron';
-import { createInviteWindow, mainWindow } from './window';
+import { createInviteWindow, mainWindow } from './window.js';
 import {
   getConfig,
   getConfigLocation,
   getDisplayVersion,
   setConfig,
-  setWindowState,
-} from './utils';
+} from './utils.js';
 import * as path from 'path';
-import { createSettingsWindow } from './settings/main';
+import { createSettingsWindow } from './settings/main.js';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 export let tray: any = null;
 let trayIcon = 'ac_plug_colored';
 app.whenReady().then(async () => {

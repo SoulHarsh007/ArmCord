@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { injectTitlebar } from '../preload/titlebar';
+import { injectTitlebar } from '../preload/titlebar.js';
 injectTitlebar();
 contextBridge.exposeInMainWorld('armcordinternal', {
   restart: () => ipcRenderer.send('restart'),

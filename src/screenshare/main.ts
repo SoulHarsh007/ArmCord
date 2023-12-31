@@ -1,6 +1,9 @@
 import { BrowserWindow, desktopCapturer, ipcMain, session } from 'electron';
 import path from 'path';
-import { iconPath } from '../main';
+import { iconPath } from '../main.js';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 let capturerWindow: BrowserWindow;
 function registerCustomHandler(): void {
@@ -37,7 +40,7 @@ function registerCustomHandler(): void {
           webPreferences: {
             sandbox: false,
             spellcheck: false,
-            preload: path.join(__dirname, 'preload.js'),
+            preload: path.join(__dirname, 'preload.mjs'),
           },
         });
         ipcMain.once('selectScreenshareSource', (_event, id, name) => {

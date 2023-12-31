@@ -12,18 +12,21 @@ import {
   setConfig,
   setLang,
   Settings,
-} from './utils';
+} from './utils.js';
 
-import './extensions/mods';
-import { createSetupWindow } from './setup/main';
-import { createSplashWindow } from './splash/main';
-import { createTManagerWindow } from './themeManager/main';
-import './tray';
+import './extensions/mods.js';
+import { createSetupWindow } from './setup/main.js';
+import { createSplashWindow } from './splash/main.js';
+import { createTManagerWindow } from './themeManager/main.js';
+import './tray.js';
 import {
   createCustomWindow,
   createNativeWindow,
   createTransparentWindow,
-} from './window';
+} from './window.js';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export let iconPath: string;
 export let settings: any;

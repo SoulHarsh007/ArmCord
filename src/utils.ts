@@ -1,10 +1,13 @@
-import * as fs from 'fs';
-import { app, dialog, globalShortcut } from 'electron';
-import path from 'path';
 import fetch from 'cross-fetch';
+import { WebContents, app, dialog, globalShortcut } from 'electron';
 import extract from 'extract-zip';
-import util from 'util';
-const streamPipeline = util.promisify(require('stream').pipeline);
+import * as fs from 'fs';
+import path from 'path';
+import { createInviteWindow } from './window.js';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 export let firstRun: boolean;
 export let contentPath: string;
 export let transparency: boolean;
@@ -71,22 +74,13 @@ export function setup(): void {
 }
 
 //Get the version value from the "package.json" file
-export const packageVersion = require('../package.json').version;
+export const packageVersion = app.getVersion();
 
 export function getVersion(): string {
   return packageVersion;
 }
 export function getDisplayVersion(): string {
-  //Checks if the app version # has 4 sections (3.1.0.0) instead of 3 (3.1.0) / Shitty way to check if Kernel Mod is installed
-  if ((app.getVersion() === packageVersion) === false) {
-    if ((app.getVersion() === process.versions.electron) === true) {
-      return `Dev Build (${packageVersion})`;
-    } else {
-      return `${packageVersion} [Modified]`;
-    }
-  } else {
-    return packageVersion;
-  }
+  return packageVersion;
 }
 export async function injectJS(inject: string): Promise<void> {
   const js = await (await fetch(`${inject}`)).text();
@@ -402,7 +396,7 @@ export async function installModLoader(): Promise<void> {
       recursive: true,
       force: true,
     });
-    import('./extensions/plugin');
+    import('./extensions/plugin.js');
     console.log('[Mod loader] Skipping');
   } else {
     const pluginFolder = `${app.getPath('userData')}/plugins/`;
@@ -422,15 +416,17 @@ export async function installModLoader(): Promise<void> {
           console.log('[Mod loader] Created missing plugin folder');
         }
         let loaderZip = await fetch('https://armcord.app/loader.zip');
-        if (!loaderZip.ok)
+        if (!loaderZip.ok || !loaderZip.body)
           throw new Error(`unexpected response ${loaderZip.statusText}`);
-        await streamPipeline(loaderZip.body, fs.createWriteStream(zipPath));
+        await loaderZip
+          .arrayBuffer()
+          .then((buffer) => fs.writeFileSync(zipPath, Buffer.from(buffer)));
         await extract(zipPath, {
           dir: path.join(app.getPath('userData'), 'plugins'),
         });
         modInstallState = 'modDownload';
         updateModBundle();
-        import('./extensions/plugin');
+        import('./extensions/plugin.js');
         modInstallState = 'done';
       } catch (e) {
         console.log('[Mod loader] Failed to install modloader');
@@ -443,7 +439,7 @@ export async function installModLoader(): Promise<void> {
     } else {
       modInstallState = 'modDownload';
       updateModBundle();
-      import('./extensions/plugin');
+      import('./extensions/plugin.js');
       modInstallState = 'done';
     }
   }
@@ -456,4 +452,11 @@ export async function registerGlobalKeybinds(): Promise<void> {
       console.log(keybind);
     });
   });
+}
+
+export async function startARRPCServer(webContents: WebContents) {
+  const { default: RPCServer } = await import('arrpc');
+  const server = await new RPCServer();
+  server.on('activity', (data: unknown) => webContents.send('rpc', data));
+  server.on('invite', (code: string) => createInviteWindow(code));
 }

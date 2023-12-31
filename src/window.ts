@@ -14,10 +14,10 @@ import contextMenu from 'electron-context-menu';
 import * as fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { registerIpc } from './ipc';
-import { iconPath } from './main';
-import { setMenu } from './menu';
-import { tray } from './tray';
+import { registerIpc } from './ipc.js';
+import { iconPath } from './main.js';
+import { setMenu } from './menu.js';
+import { tray } from './tray.js';
 import {
   checkIfConfigIsBroken,
   contentPath,
@@ -27,7 +27,12 @@ import {
   registerGlobalKeybinds,
   setConfig,
   setWindowState,
-} from './utils';
+  startARRPCServer,
+} from './utils.js';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 export let mainWindow: BrowserWindow;
 export let inviteWindow: BrowserWindow;
 let forceQuit = false;
@@ -164,7 +169,7 @@ async function doAfterDefiningTheWindow(): Promise<void> {
   });
   if (getConfig('useLegacyCapturer') == false) {
     console.log('Starting screenshare module...');
-    import('./screenshare/main');
+    import('./screenshare/main.js');
   }
 
   mainWindow.webContents.session.webRequest.onBeforeRequest(
@@ -338,9 +343,8 @@ async function doAfterDefiningTheWindow(): Promise<void> {
     );
   });
   console.log(contentPath);
-  if (getConfig('inviteWebsocket') == true) {
-    require('arrpc');
-    //await startServer();
+  if (getConfig('inviteWebsocket') === true) {
+    startARRPCServer(mainWindow.webContents);
   }
   if (firstRun) {
     mainWindow.close();
@@ -384,7 +388,7 @@ export async function createCustomWindow(): Promise<void> {
     webPreferences: {
       webviewTag: true,
       sandbox: false,
-      preload: path.join(__dirname, 'preload/preload.js'),
+      preload: path.join(__dirname, 'preload/preload.mjs'),
       spellcheck: getConfig('spellcheck'),
     },
   });
@@ -406,7 +410,7 @@ export async function createNativeWindow(): Promise<void> {
     webPreferences: {
       webviewTag: true,
       sandbox: false,
-      preload: path.join(__dirname, 'preload/preload.js'),
+      preload: path.join(__dirname, 'preload/preload.mjs'),
       spellcheck: getConfig('spellcheck'),
     },
   });
@@ -429,7 +433,7 @@ export async function createTransparentWindow(): Promise<void> {
     webPreferences: {
       sandbox: false,
       webviewTag: true,
-      preload: path.join(__dirname, 'preload/preload.js'),
+      preload: path.join(__dirname, 'preload/preload.mjs'),
       spellcheck: getConfig('spellcheck'),
     },
   });

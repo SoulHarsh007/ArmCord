@@ -10,10 +10,10 @@ import {
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { customTitlebar } from './main';
-import { createSettingsWindow } from './settings/main';
-import { splashWindow } from './splash/main';
-import { createTManagerWindow } from './themeManager/main';
+import { customTitlebar } from './main.js';
+import { createSettingsWindow } from './settings/main.js';
+import { splashWindow } from './splash/main.js';
+import { createTManagerWindow } from './themeManager/main.js';
 import {
   Settings,
   getConfig,
@@ -27,8 +27,10 @@ import {
   setConfigBulk,
   setLang,
   sleep,
-} from './utils';
-import { mainWindow } from './window';
+} from './utils.js';
+import { mainWindow } from './window.js';
+import { fileURLToPath } from 'url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const userDataPath = app.getPath('userData');
 const storagePath = path.join(userDataPath, '/storage/');
 const themesPath = path.join(userDataPath, '/themes/');

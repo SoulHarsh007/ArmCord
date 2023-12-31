@@ -2,7 +2,7 @@
 // In case of faulty update of ArmCord we can quickly push an update to the user and possibly try to fix it
 // This is completely optional and is disabled by default in settings
 import { ipcRenderer } from 'electron';
-import { injectJS } from '../utils';
+import { injectJS } from '../utils.js';
 
 const patchEndpoint = 'https://patch.armcord.app';
 const version = ipcRenderer.sendSync('get-app-version', 'app-version');

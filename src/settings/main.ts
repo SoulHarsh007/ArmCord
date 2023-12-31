@@ -1,9 +1,12 @@
-import { BrowserWindow, app, ipcMain, shell } from 'electron';
-import { getDisplayVersion } from '../utils';
+import { BrowserWindow, app, shell } from 'electron';
+import { getDisplayVersion } from '../utils.js';
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
 let settingsWindow: BrowserWindow;
 let instance = 0;
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export function createSettingsWindow(): void {
   console.log('Creating a settings window.');
@@ -24,7 +27,7 @@ export function createSettingsWindow(): void {
       autoHideMenuBar: true,
       webPreferences: {
         sandbox: false,
-        preload: path.join(__dirname, 'preload.js'),
+        preload: path.join(__dirname, 'preload.mjs'),
       },
     });
     async function settingsLoadPage(): Promise<void> {

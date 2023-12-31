@@ -1,6 +1,9 @@
 import { BrowserWindow } from 'electron';
-import { iconPath } from '../main';
+import { iconPath } from '../main.js';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export let splashWindow: BrowserWindow;
 export async function createSplashWindow(): Promise<void> {
@@ -16,7 +19,7 @@ export async function createSplashWindow(): Promise<void> {
     autoHideMenuBar: true,
     webPreferences: {
       sandbox: false,
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'preload.mjs'),
     },
   });
   splashWindow.loadURL(`file://${__dirname}/splash.html`);
