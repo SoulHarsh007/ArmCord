@@ -41,12 +41,14 @@ if (!app.requestSingleInstanceLock() && getConfig('multiInstance') === false) {
   app.commandLine.appendSwitch('disable-features', 'WidgetLayering');
   crashReporter.start({ uploadToServer: false });
 
-  if (
-    process.platform === 'linux' &&
-    process.env.XDG_SESSION_TYPE?.toLowerCase() === 'wayland'
-  ) {
-    app.commandLine.appendSwitch('enable-features=WebRTCPipeWireCapturer');
+  if (process.env.XDG_SESSION_TYPE?.toLowerCase() === 'wayland') {
+    app.commandLine.appendSwitch(
+      'enable-features',
+      'UseOzonePlatform,WebRTCPipeWireCapturer,WaylandWindowDecorations'
+    );
     console.log('Wayland detected, using PipeWire for video capture.');
+    app.commandLine.appendSwitch('ozone-platform-hint', 'wayland');
+    console.log('Wayland detected, setting ozone-platform-hint to wayland.');
   }
 
   app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
