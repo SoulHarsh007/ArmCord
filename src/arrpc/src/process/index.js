@@ -5,50 +5,40 @@ const log = (...args) =>
     ...args
   );
 
-const DetectableDB = require('./detectable.json');
-
-const Natives = require('./native/index.js');
-const Native = Natives[process.platform];
+const { readdir, readFile } = require('fs/promises');
+const detectableDB = require('./detectable.json');
 
 const timestamps = {},
   names = {},
   pids = {};
-class ProcessServer {
+module.exports = class ProcessServer {
   constructor(handlers) {
-    if (!Native) return; // log('unsupported platform:', process.platform);
-
     this.handlers = handlers;
-
-    this.scan = this.scan.bind(this);
-
     this.scan();
-    setInterval(this.scan, 5000);
+    setInterval(() => {
+      this.scan();
+    }, 5000);
 
     log('started');
   }
 
   async scan() {
-    const startTime = performance.now();
-    const processes = await Native.getProcesses();
+    const processes = await this.getProcesses();
     const ids = [];
 
-    // log(`got processed in ${(performance.now() - startTime).toFixed(2)}ms`);
-
-    for (const [pid, _path] of processes) {
-      const path = _path.toLowerCase().replaceAll('\\', '/');
+    for (const [pid, path] of processes) {
       const toCompare = [
         path.split('/').pop(),
         path.split('/').slice(-2).join('/'),
       ];
 
       for (const p of toCompare.slice()) {
-        // add more possible tweaked paths for less false negatives
-        toCompare.push(p.replace('64', '')); // remove 64bit identifiers-ish
+        toCompare.push(p.replace('64', ''));
         toCompare.push(p.replace('.x64', ''));
         toCompare.push(p.replace('x64', ''));
       }
 
-      for (const { executables, id, name } of DetectableDB) {
+      for (const { executables, id, name } of detectableDB) {
         if (
           executables?.some(
             (x) => !x.isLauncher && toCompare.some((y) => x.name === y)
@@ -56,12 +46,10 @@ class ProcessServer {
         ) {
           names[id] = name;
           pids[id] = pid;
-
           ids.push(id);
           if (!timestamps[id]) {
             log('detected game!', name);
             timestamps[id] = Date.now();
-
             this.handlers.message(
               {
                 socketId: id,
@@ -104,9 +92,19 @@ class ProcessServer {
         );
       }
     }
-
-    // log(`finished scan in ${(performance.now() - startTime).toFixed(2)}ms`);
-    // process.stdout.write(`\r${' '.repeat(100)}\r[${rgb(88, 101, 242, 'arRPC')} > ${rgb(237, 66, 69, 'process')}] scanned (took ${(performance.now() - startTime).toFixed(2)}ms)`);
   }
-}
-module.exports = ProcessServer;
+
+  async getProcesses() {
+    const pids = (await readdir('/proc')).filter((f) => !isNaN(+f));
+    return (
+      await Promise.all(
+        pids.map((pid) =>
+          readFile(`/proc/${pid}/cmdline`, 'utf8').then(
+            (path) => [+pid, path.replace(/\0/g, '')],
+            () => {}
+          )
+        )
+      )
+    ).filter((x) => x);
+  }
+};

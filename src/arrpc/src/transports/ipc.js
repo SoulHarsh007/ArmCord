@@ -5,23 +5,17 @@ const log = (...args) =>
     ...args
   );
 
-const { join } = require('path');
-const { platform, env } = require('process');
 const { unlinkSync } = require('fs');
+const { join } = require('path');
+const { env } = require('process');
+const { createConnection, createServer } = require('net');
 
-const { createServer, createConnection } = require('net');
+const SOCKET_PATH = join(
+  env.XDG_RUNTIME_DIR || env.TMPDIR || env.TMP || env.TEMP || '/tmp',
+  'discord-ipc'
+);
 
-const SOCKET_PATH =
-  platform === 'win32'
-    ? '\\\\?\\pipe\\discord-ipc'
-    : join(
-        env.XDG_RUNTIME_DIR || env.TMPDIR || env.TMP || env.TEMP || '/tmp',
-        'discord-ipc'
-      );
-
-// enums for various constants
 const Types = {
-  // types of packets
   HANDSHAKE: 0,
   FRAME: 1,
   CLOSE: 2,
@@ -30,14 +24,12 @@ const Types = {
 };
 
 const CloseCodes = {
-  // codes for closures
   CLOSE_NORMAL: 1000,
   CLOSE_UNSUPPORTED: 1003,
   CLOSE_ABNORMAL: 1006,
 };
 
 const ErrorCodes = {
-  // codes for errors
   INVALID_CLIENTID: 4000,
   INVALID_ORIGIN: 4001,
   RATELIMITED: 4002,
@@ -51,18 +43,19 @@ let uniqueId = 0;
 const encode = (type, data) => {
   data = JSON.stringify(data);
   const dataSize = Buffer.byteLength(data);
-
   const buf = Buffer.alloc(dataSize + 8);
-  buf.writeInt32LE(type, 0); // type
-  buf.writeInt32LE(dataSize, 4); // data size
-  buf.write(data, 8, dataSize); // data
+  buf.writeInt32LE(type, 0);
+  buf.writeInt32LE(dataSize, 4);
+  buf.write(data, 8, dataSize);
 
   return buf;
 };
 
 const read = (socket) => {
   let resp = socket.read(8);
-  if (!resp) return;
+  if (!resp) {
+    return;
+  }
 
   resp = Buffer.from(resp);
   const type = resp.readInt32LE(0);
@@ -87,15 +80,17 @@ const read = (socket) => {
       break;
 
     case Types.HANDSHAKE:
-      if (socket._handshook) throw new Error('already handshook');
-
+      if (socket._handshook) {
+        throw new Error('already handshook');
+      }
       socket._handshook = true;
       socket.emit('handshake', data);
       break;
 
     case Types.FRAME:
-      if (!socket._handshook) throw new Error('need to handshake first');
-
+      if (!socket._handshook) {
+        throw new Error('need to handshake first');
+      }
       socket.emit('request', data);
       break;
 
@@ -134,9 +129,9 @@ const socketIsAvailable = async (socket) => {
   };
 
   const possibleOutcomes = Promise.race([
-    new Promise((res) => socket.on('error', res)), // errored
-    new Promise((res, rej) => socket.on('pong', () => rej('socket ponged'))), // ponged
-    new Promise((res, rej) => setTimeout(() => rej('timed out'), 1000)), // timed out
+    new Promise((res) => socket.on('error', res)),
+    new Promise((res, rej) => socket.on('pong', () => rej('socket ponged'))),
+    new Promise((res, rej) => setTimeout(() => rej('timed out'), 1000)),
   ]).then(
     () => true,
     (e) => e
@@ -146,11 +141,12 @@ const socketIsAvailable = async (socket) => {
 
   const outcome = await possibleOutcomes;
   stop();
-  log(
-    'checked if socket is available:',
-    outcome === true,
-    outcome === true ? '' : `- reason: ${outcome}`
-  );
+  if (process.env.ARRPC_DEBUG)
+    log(
+      'checked if socket is available:',
+      outcome === true,
+      outcome === true ? '' : `- reason: ${outcome}`
+    );
 
   return outcome === true;
 };
@@ -160,16 +156,15 @@ const getAvailableSocket = async (tries = 0) => {
     throw new Error('ran out of tries to find socket', tries);
   }
 
-  const path = SOCKET_PATH + '-' + tries;
+  const path = `${SOCKET_PATH}-${tries}`;
   const socket = createConnection(path);
 
-  log('checking', path);
+  if (process.env.ARRPC_DEBUG) log('checking', path);
 
   if (await socketIsAvailable(socket)) {
-    if (platform !== 'win32')
-      try {
-        unlinkSync(path);
-      } catch {}
+    try {
+      unlinkSync(path);
+    } catch {}
 
     return path;
   }
@@ -178,7 +173,7 @@ const getAvailableSocket = async (tries = 0) => {
   return getAvailableSocket(tries + 1);
 };
 
-class IPCServer {
+module.exports = class IPCServer {
   constructor(handers) {
     return new Promise(async (res) => {
       this.handlers = handers;
@@ -222,11 +217,10 @@ class IPCServer {
     });
 
     socket.once('handshake', (params) => {
-      log('handshake:', params);
+      if (process.env.ARRPC_DEBUG) log('handshake:', params);
 
-      const ver = parseInt(params.v ?? 1);
+      const ver = parseInt(params.v ?? 1, 10);
       const clientId = params.client_id ?? '';
-      // encoding is always json for ipc
 
       socket.close = (code = CloseCodes.CLOSE_NORMAL, message = '') => {
         socket.end(
@@ -265,7 +259,7 @@ class IPCServer {
 
       socket._send = socket.send;
       socket.send = (msg) => {
-        log('sending', msg);
+        if (process.env.ARRPC_DEBUG) log('sending', msg);
         socket.write(encode(Types.FRAME, msg));
       };
 
@@ -276,8 +270,7 @@ class IPCServer {
   }
 
   onMessage(socket, msg) {
-    log('message', msg);
+    if (process.env.ARRPC_DEBUG) log('message', msg);
     this.handlers.message(socket, msg);
   }
-}
-module.exports = IPCServer;
+};

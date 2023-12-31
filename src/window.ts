@@ -73,15 +73,6 @@ async function doAfterDefiningTheWindow(): Promise<void> {
     );
     mainWindow.hide(); // please don't flashbang the user
   }
-  if (
-    getConfig('windowStyle') === 'transparency' &&
-    process.platform === 'win32'
-  ) {
-    mainWindow.setBackgroundMaterial('mica');
-    if (getConfig('startMinimized') === false) {
-      mainWindow.show();
-    }
-  }
   let ignoreProtocolWarning = getConfig('ignoreProtocolWarning');
   await checkIfConfigIsBroken();
   registerIpc();
@@ -162,7 +153,7 @@ async function doAfterDefiningTheWindow(): Promise<void> {
     }
     return { action: 'deny' };
   });
-  if (getConfig('useLegacyCapturer') == false) {
+  if (getConfig('useLegacyCapturer') === false) {
     console.log('Starting screenshare module...');
     import('./screenshare/main');
   }
@@ -213,12 +204,8 @@ async function doAfterDefiningTheWindow(): Promise<void> {
       let trayPath = nativeImage.createFromPath(
         path.join(app.getPath('temp'), '/', 'tray.png')
       );
-      if (process.platform === 'darwin' && trayPath.getSize().height > 22)
-        trayPath = trayPath.resize({ height: 22 });
-      if (process.platform === 'win32' && trayPath.getSize().height > 32)
-        trayPath = trayPath.resize({ height: 32 });
       if (getConfig('tray')) {
-        if (getConfig('trayIcon') == 'default') {
+        if (getConfig('trayIcon') === 'default') {
           tray.setImage(trayPath);
         }
       }
@@ -287,35 +274,22 @@ async function doAfterDefiningTheWindow(): Promise<void> {
   });
   await setMenu();
   mainWindow.on('close', async (e) => {
-    if (process.platform === 'darwin' && forceQuit) {
-      mainWindow.close();
-    } else {
-      let [width, height] = mainWindow.getSize();
-      await setWindowState({
-        width,
-        height,
-        isMaximized: mainWindow.isMaximized(),
-        x: mainWindow.getPosition()[0],
-        y: mainWindow.getPosition()[1],
-      });
-      if (getConfig('minimizeToTray')) {
-        e.preventDefault();
-        mainWindow.hide();
-      } else if (!getConfig('minimizeToTray')) {
-        e.preventDefault();
-        app.quit();
-      }
+    let [width, height] = mainWindow.getSize();
+    await setWindowState({
+      width,
+      height,
+      isMaximized: mainWindow.isMaximized(),
+      x: mainWindow.getPosition()[0],
+      y: mainWindow.getPosition()[1],
+    });
+    if (getConfig('minimizeToTray')) {
+      e.preventDefault();
+      mainWindow.hide();
+    } else if (!getConfig('minimizeToTray')) {
+      e.preventDefault();
+      app.quit();
     }
   });
-  if (process.platform === 'darwin') {
-    app.on('before-quit', function (event) {
-      if (!forceQuit) {
-        event.preventDefault();
-        forceQuit = true;
-        app.quit();
-      }
-    });
-  }
   mainWindow.on('focus', () => {
     mainWindow.webContents.executeJavaScript(
       `document.body.removeAttribute("unFocused");`

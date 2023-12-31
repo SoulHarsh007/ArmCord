@@ -4,6 +4,7 @@ const log = (...args) =>
     `[${rgb(88, 101, 242, 'arRPC')} > ${rgb(87, 242, 135, 'bridge')}]`,
     ...args
   );
+
 const { EventEmitter } = require('events');
 
 const IPCServer = require('./transports/ipc.js');
@@ -11,7 +12,7 @@ const WSServer = require('./transports/websocket.js');
 const ProcessServer = require('./process/index.js');
 
 let socketId = 0;
-class RPCServer extends EventEmitter {
+module.exports = class RPCServer extends EventEmitter {
   constructor() {
     super();
     return (async () => {
@@ -27,7 +28,12 @@ class RPCServer extends EventEmitter {
 
       this.ipc = await new IPCServer(handlers);
       this.ws = await new WSServer(handlers);
-      this.process = await new ProcessServer(handlers);
+
+      if (
+        !process.argv.includes('--no-process-scanning') &&
+        !process.env.ARRPC_NO_PROCESS_SCANNING
+      )
+        this.process = await new ProcessServer(handlers);
 
       return this;
     })();
@@ -40,10 +46,7 @@ class RPCServer extends EventEmitter {
 
       data: {
         v: 1,
-
-        // needed otherwise some stuff errors out parsing json strictly
         user: {
-          // mock user data using arRPC app/bot
           id: '1045800378228281345',
           username: 'arRPC',
           discriminator: '0000',
@@ -79,10 +82,9 @@ class RPCServer extends EventEmitter {
 
     switch (cmd) {
       case 'SET_ACTIVITY':
-        const { activity, pid } = args; // translate given parameters into what discord dispatch expects
+        const { activity, pid } = args;
 
         if (!activity) {
-          // Activity clear
           socket.send?.({
             cmd,
             data: null,
@@ -96,22 +98,16 @@ class RPCServer extends EventEmitter {
             socketId: socket.socketId.toString(),
           });
         }
-
         const { buttons, timestamps, instance } = activity;
-
         socket.lastPid = pid ?? socket.lastPid;
-
         const metadata = {};
         const extra = {};
         if (buttons) {
-          // map buttons into expected metadata
           metadata.button_urls = buttons.map((x) => x.url);
           extra.buttons = buttons.map((x) => x.label);
         }
-
         if (timestamps)
           for (const x in timestamps) {
-            // translate s -> ms timestamps
             if (
               Date.now().toString().length - timestamps[x].toString().length >
               2
@@ -144,15 +140,23 @@ class RPCServer extends EventEmitter {
       case 'GUILD_TEMPLATE_BROWSER':
       case 'INVITE_BROWSER':
         const { code } = args;
-        socket.send({
-          cmd,
-          data: {
-            code,
-          },
-          nonce,
-        });
-
-        this.emit(cmd === 'INVITE_BROWSER' ? 'invite' : 'guild-template', code);
+        const isInvite = cmd === 'INVITE_BROWSER';
+        const callback = (isValid = true) => {
+          socket.send({
+            cmd,
+            data: isValid
+              ? { code }
+              : {
+                  code: isInvite ? 4011 : 4017,
+                  message: `Invalid ${
+                    isInvite ? 'invite' : 'guild template'
+                  } id: ${code}`,
+                },
+            evt: isValid ? null : 'ERROR',
+            nonce,
+          });
+        };
+        this.emit(isInvite ? 'invite' : 'guild-template', code, callback);
         break;
 
       case 'DEEP_LINK':
@@ -160,5 +164,4 @@ class RPCServer extends EventEmitter {
         break;
     }
   }
-}
-module.exports = RPCServer;
+};

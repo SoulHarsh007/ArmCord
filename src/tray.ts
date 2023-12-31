@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import {
   Menu,
   MessageBoxOptions,
@@ -7,16 +6,16 @@ import {
   dialog,
   nativeImage,
 } from 'electron';
-import { createInviteWindow, mainWindow } from './window';
+import * as fs from 'fs';
+import * as path from 'path';
+import { createSettingsWindow } from './settings/main';
 import {
   getConfig,
   getConfigLocation,
   getDisplayVersion,
   setConfig,
-  setWindowState,
 } from './utils';
-import * as path from 'path';
-import { createSettingsWindow } from './settings/main';
+import { createInviteWindow, mainWindow } from './window';
 export let tray: any = null;
 let trayIcon = 'ac_plug_colored';
 app.whenReady().then(async () => {
@@ -29,22 +28,13 @@ app.whenReady().then(async () => {
   );
   let trayVerIcon;
   trayVerIcon = function () {
-    if (process.platform == 'win32') {
-      return trayPath.resize({ height: 16 });
-    } else if (process.platform == 'darwin') {
-      return trayPath.resize({ height: 18 });
-    } else if (process.platform == 'linux') {
-      return trayPath.resize({ height: 24 });
-    }
-    return undefined;
+    return trayPath.resize({ height: 24 });
   };
 
-  if (process.platform == 'darwin' && trayPath.getSize().height > 22)
-    trayPath = trayPath.resize({ height: 22 });
   if (getConfig('tray')) {
     let clientName = getConfig('clientName') ?? 'ArmCord';
     tray = new Tray(trayPath);
-    if (finishedSetup == false) {
+    if (finishedSetup === false) {
       const contextMenu = Menu.buildFromTemplate([
         {
           label: `Finish the setup first!`,
